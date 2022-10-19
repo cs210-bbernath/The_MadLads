@@ -1,4 +1,4 @@
-def compute_loss_MSE(y, tx, w):
+def compute_mse(y, tx, w):
     """Calculate the loss using either MSE or MAE.
     
     Args:
@@ -11,6 +11,10 @@ def compute_loss_MSE(y, tx, w):
     """
     error = y - tx.dot(w)
     return 1/2 * np.mean(error**2)
+
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
+
 def compute_gradient(y, tx, w):
     """Computes the gradient at w.
         
@@ -27,6 +31,10 @@ def compute_gradient(y, tx, w):
     gradient = -(1/N) * tx.T.dot(error)
     
     return gradient
+
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
+
 def gradient_descent(y, tx, initial_w, max_iters, gamma):
     """The Gradient Descent (GD) algorithm.
         
@@ -60,8 +68,10 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma):
         losses.append(loss)
         print("GD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
               bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
-
     return losses, ws
+
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
 
 def compute_stoch_gradient(y, tx, w):
     """Compute a stochastic gradient at w from just few examples n and their corresponding y_n labels.
@@ -79,6 +89,10 @@ def compute_stoch_gradient(y, tx, w):
     stoch_gradient = -(1/N) * tx.T.dot(error)
     
     return stoch_gradient
+
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
+
 def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma):
     """The Stochastic Gradient Descent algorithm (SGD).
             
@@ -117,17 +131,3 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma):
         print("SGD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
               bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
     return losses, ws
-
-def ridge_regression(y, tx, lambda_):
-    aI = 2 * tx.shape[0] * lambda_ * np.identity(tx.shape[1])
-    a = tx.T.dot(tx) + aI
-    b = tx.T.dot(y)
-    e = compute_loss_MSE(y, tx, w)
-    return np.linalg.solve(a, b), e
-
-def least_squares(y, tx):
-    a = tx.T.dot(tx)
-    b = tx.T.dot(y)
-    w = np.linalg.solve(a, b)
-    e = compute_loss_MSE(y, tx, w)
-    return w, e
