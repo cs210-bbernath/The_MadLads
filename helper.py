@@ -116,14 +116,15 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma):
             losses.append(loss)
         print("SGD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
               bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
-        
     return losses, ws
+
 def ridge_regression(y, tx, lambda_):
     aI = 2 * tx.shape[0] * lambda_ * np.identity(tx.shape[1])
     a = tx.T.dot(tx) + aI
     b = tx.T.dot(y)
     e = compute_loss_MSE(y, tx, w)
     return np.linalg.solve(a, b), e
+
 def least_squares(y, tx):
     a = tx.T.dot(tx)
     b = tx.T.dot(y)
