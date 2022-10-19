@@ -2,3 +2,4 @@ data/sample_submission/
 data/test/
 data/train/
 *.csv
+__pycache__
