@@ -33,12 +33,12 @@ def build_k_indices(y, k_fold, seed):
 
 
 
-def cross_validation(y, x, k_indices, k, lambda_, degree):
+def cross_validation(y, tx, func, k_indices = 0, k = 0, lambda_ = 0, degree = 0, initial_w = 0, max_iters = 0, gamma = 0, batch_size = 0):
     """return the loss of ridge regression for a fold corresponding to k_indices
     
     Args:
         y:          shape=(N,)
-        x:          shape=(N,)
+        tx:          shape=(N,)
         k_indices:  2D array returned by build_k_indices()
         k:          scalar, the k-th fold (N.B.: not to confused with k_fold which is the fold nums)
         lambda_:    scalar, cf. ridge_regression()
@@ -60,29 +60,42 @@ def cross_validation(y, x, k_indices, k, lambda_, degree):
     indices = k_indices[k]
     
     print("1")
-    
-    for i in range(len(y)):
-        if i in indices:
-            test_x.append(x[i])
-            test_y.append(y[i])
-        else:
-            train_x.append(x[i])
-            train_y.append(y[i])
+    ind = np.arange(y.shape[0])
+    train_ind = ~np.isin(ind, indices)
+    test_x = tx[indices]
+    test_y = y[indices]
+    train_x = tx[train_ind]
+    train_y = y[train_ind]
 
     print("2")
 
     # form data with polynomial degree:
     #poly_tr = build_poly(train_x, degree)
     #poly_te = build_poly(test_x, degree)
-    model_tr, _ = build_model_data(train_x, train_y)
+    model_tr = np.c_[train_x]
     print("3")
-    model_te, _ = build_model_data(test_x, test_y)
+    model_te= np.c_[test_x]
     
     print("3,5")
 
     # ridge regression:
-    w = ridge_regression(train_y, model_tr, lambda_)
-    
+    if(func == 'ridge_regression'):
+        w = ridge_regression(train_y, model_tr, lambda_)
+    elif func == 'reg_logistic_regression':
+        l, ws = reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma)
+        w = ws[max_iters-1]
+    elif func == 'logistic_regression':
+        l, ws = logistic_regression(y, tx, initial_w, max_iters, gamma)
+        w = ws[max_iters-1]
+    elif func == 'logistic_regression':
+        w, l = least_squares(y, tx)
+    elif func == 'stochastic_gradient_descent':
+        l, ws = stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma)
+        w = ws[max_iters-1]
+    elif func == 'gradient_descent':
+        l, ws = gradient_descent(y, tx, initial_w, max_iters, gamma)
+        w = ws[max_iters-1]
+
     print("4")
 
     # calculate the loss for train and test data:
@@ -95,7 +108,7 @@ def cross_validation(y, x, k_indices, k, lambda_, degree):
 
 from plots import cross_validation_visualization
 
-def cross_validation_demo(degree, k_fold, lambdas, y, tx):
+def cross_validation_demo(y, tx, func, k_fold, lambdas=[], k_indices = 0, degree = 0, initial_w = 0, max_iters = 0, gammas = [], batch_size = 0):
     """cross validation over regularisation parameter lambda.
     
     Args:
@@ -118,25 +131,97 @@ def cross_validation_demo(degree, k_fold, lambdas, y, tx):
     rmse_te = []
     
     # cross validation over lambdas:
-    for ind, lambda_ in enumerate(lambdas):
+    if lambdas != [] and gammas != []:
+        for ind, lambda_ in enumerate(lambdas):
+            for ind, gamma in enumerate(gammas):
+                rmse_tr_tmp = []
+                rmse_te_tmp = []
+                for k in range(k_fold):
+                    loss_tr, loss_te = cross_validation(y=y, tx=tx, func=func, k_indices=k_indices, k=k, lambda_=lambda_, degree=degree, initial_w=initial_w, max_iters=max_iters, gamma=gamma, batch_size=batch_size)
+                    rmse_tr_tmp.append(loss_tr)
+                    rmse_te_tmp.append(loss_te)
+                rmse_tr.append(np.mean(rmse_tr_tmp))
+                rmse_te.append(np.mean(rmse_te_tmp))
+    if lambdas == [] and gammas != []:
+        for ind, gamma in enumerate(gammas):
+            rmse_tr_tmp = []
+            rmse_te_tmp = []
+            for k in range(k_fold):
+                loss_tr, loss_te = cross_validation(y=y, tx=tx, func=func, k_indices=k_indices, k=k, degree=degree, initial_w=initial_w, max_iters=max_iters, gamma=gamma, batch_size=batch_size)
+                rmse_tr_tmp.append(loss_tr)
+                rmse_te_tmp.append(loss_te)
+            rmse_tr.append(np.mean(rmse_tr_tmp))
+            rmse_te.append(np.mean(rmse_te_tmp))
+    
+    if lambdas != [] and gammas == []:
+        for ind, lambda_ in enumerate(lambdas):
+            rmse_tr_tmp = []
+            rmse_te_tmp = []
+            for k in range(k_fold):
+                loss_tr, loss_te = cross_validation(y=y, tx=tx, func=func, k_indices=k_indices, k=k, lambda_=lambda_, degree=degree, initial_w=inital_w, max_iters=max_iters, batch_size=batch_size)
+                rmse_tr_tmp.append(loss_tr)
+                rmse_te_tmp.append(loss_te)
+            rmse_tr.append(np.mean(rmse_tr_tmp))
+            rmse_te.append(np.mean(rmse_te_tmp))
+    if lambdas == [] and gammas == []:
         rmse_tr_tmp = []
         rmse_te_tmp = []
         for k in range(k_fold):
-            loss_tr, loss_te = cross_validation(y, tx, k_indices, k, lambda_, degree)
+            loss_tr, loss_te = cross_validation(y=y, tx=tx, func=func, k_indices=k_indices, k=k, degree=degree, initial_w=initial_w, max_iters=max_iters, batch_size=batch_size)
             rmse_tr_tmp.append(loss_tr)
             rmse_te_tmp.append(loss_te)
         rmse_tr.append(np.mean(rmse_tr_tmp))
         rmse_te.append(np.mean(rmse_te_tmp))
-
-    cross_validation_visualization(lambdas, rmse_tr, rmse_te)
-    
+    if lambdas != [] and gammas == []:
+        cross_validation_visualization(lambdas, rmse_tr, rmse_te)
+    if lambdas ==[] and gammas !=[]:
+        cross_validation_visualization(gammas, rmse_tr, rmse_te)
+        
     best_rmse = min(rmse_te)
     best_lambda = lambdas[rmse_te.index(best_rmse)]
     
     print("For polynomial expansion up to degree %.f, the choice of lambda which leads to the best test rmse is %.5f with a test rmse of %.3f" % (degree, best_lambda, best_rmse))
     return best_lambda, best_rmse
 
+def cross_validation_gradient_descent(y, tx, func, k_fold, initial_w, max_iters, gammas):
+    """cross validation over regularisation parameter lambda.
+    
+    Args:
+        degree: integer, degree of the polynomial expansion
+        k_fold: integer, the number of folds
+        lambdas: shape = (p, ) where p is the number of values of lambda to test
+    Returns:
+        best_lambda : scalar, value of the best lambda
+        best_rmse : scalar, the associated root mean squared error for the best lambda
+    """
+    
+    seed = 12
+    k_fold = k_fold
+    gammas = gammas
+    # split data in k fold
+    k_indices = build_k_indices(y, k_fold, seed)
+    # define lists to store the loss of training data and test data
+    rmse_tr = []
+    rmse_te = []
+    
+    # cross validation over lambdas:
+    for ind, gamma in enumerate(gammas):
+        rmse_tr_tmp = []
+        rmse_te_tmp = []
+        for k in range(k_fold):
+            loss_tr, loss_te = cross_validation(y, tx, func = func, k_indices= k_indices, k=k, initial_w=initial_w, max_iters= max_iters, gamma= gamma)
+            rmse_tr_tmp.append(loss_tr)
+            rmse_te_tmp.append(loss_te)
+        rmse_tr.append(np.mean(rmse_tr_tmp))
+        rmse_te.append(np.mean(rmse_te_tmp))
 
+    cross_validation_visualization(gammas, rmse_tr, rmse_te)
+    
+    best_rmse = min(rmse_te)
+    best_gamma = gammas[rmse_te.index(best_rmse)]
+    
+    print("For polynomial expansion up to degree, the choice of lambda which leads to the best test rmse is %.5f with a test rmse of %.3f" % (best_gamma, best_rmse))
+    return best_gamma, best_rmse
 
 
 def best_degree_selection(degrees, k_fold, lambdas, seed, y, tx):
