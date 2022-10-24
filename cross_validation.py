@@ -60,7 +60,6 @@ def cross_validation(y, tx, func, k_indices = 0, k = 0, lambda_ = 0, degree = 0,
     
     indices = k_indices[k]
     
-    print("1")
     ind = np.arange(y.shape[0])
     train_ind = ~np.isin(ind, indices)
     test_x = tx[indices]
@@ -68,16 +67,13 @@ def cross_validation(y, tx, func, k_indices = 0, k = 0, lambda_ = 0, degree = 0,
     train_x = tx[train_ind]
     train_y = y[train_ind]
 
-    print("2")
 
     # form data with polynomial degree:
     #poly_tr = build_poly(train_x, degree)
     #poly_te = build_poly(test_x, degree)
     model_tr = np.c_[train_x]
-    print("3")
     model_te= np.c_[test_x]
     
-    print("3,5")
 
     # ridge regression:
     if(func == 'ridge_regression'):
@@ -97,11 +93,9 @@ def cross_validation(y, tx, func, k_indices = 0, k = 0, lambda_ = 0, degree = 0,
         l, ws = gradient_descent(y, tx, initial_w, max_iters, gamma)
         w = ws[max_iters-1]
 
-    print("4")
 
     # calculate the loss for train and test data:
     loss_tr = np.sqrt(2*compute_mse(train_y, model_tr, w))
-    print("4,5")
     loss_te = np.sqrt(2*compute_mse(test_y, model_te, w))
     
     return loss_tr, loss_te
