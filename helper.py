@@ -16,6 +16,11 @@ def compute_mse(y, tx, w):
 
 #------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------
+def compute_ridge_mse(y, tx, w):
+    pred = predict_y(tx, w)
+    error = y-pred
+    return 1/2*np.mean(error**2)
+    
 
 def compute_gradient(y, tx, w):
     """Computes the gradient at w.

@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib as plt
 
 def sigmoid(t):
+    t = np.clip(t, -20, 20)
     return 1 / (1 + np.exp(-t))
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
@@ -60,14 +61,14 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         ws: a list of length max_iters containing the model parameters as numpy arrays of shape (2, ), 
             for each iteration of reg Logistic regression 
     """
-    ws = [initial_w]
+    ws = []
     losses = []
     w = initial_w
     N = len(y)
     
     for n_iter in range(max_iters):
         # compute gradient
-        gradient = 2/N * tx.T.dot(sigmoid(tx@w) - y) + (lambda_/N)*w
+        gradient = 2/N * tx.T.dot(sigmoid(tx@w) - y) + (lambda_)*w
         
         # update w by gradient
         w = w - (gamma * gradient)
@@ -75,7 +76,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         y_pred = sigmoid(tx.dot(w))
         
         # compute loss
-        loss = -np.sum(np.dot(y.T,np.log(y_pred)+ np.dot((1-y).T, np.log(1-y_pred)))) /(len(y_pred)) + (lambda_/(2*N))*(w.T.dot(w))
+        loss = -np.sum(np.dot(y.T,np.log(y_pred)+ np.dot((1-y).T, np.log(1-y_pred)))) /(len(y_pred)) + (lambda_/2)*(w.T.dot(w))
         
         # store w and loss
         ws.append(w)
