@@ -39,8 +39,8 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         # store w and loss
         ws.append(w)
         losses.append(loss)
-        print("Logistic regression iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
-              bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+        #print("Logistic regression iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
+         #     bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
 
     return losses, ws
 
@@ -67,7 +67,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     
     for n_iter in range(max_iters):
         # compute gradient
-        gradient = 2/N * tx.T.dot(sigmoid(tx.dot(w)) - y) + (lambda_/N)*w
+        gradient = 2/N * tx.T.dot(sigmoid(tx@w) - y) + (lambda_/N)*w
         
         # update w by gradient
         w = w - (gamma * gradient)
@@ -80,7 +80,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         # store w and loss
         ws.append(w)
         losses.append(loss)
-        print("Reg Logistic regression iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
-              bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+        #print("Reg Logistic regression iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
+        #      bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
 
     return losses, ws

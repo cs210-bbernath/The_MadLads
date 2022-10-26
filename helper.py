@@ -130,8 +130,8 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma):
             # store w and loss
             ws.append(w)
             losses.append(loss)
-        print("SGD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
-              bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+        #print("SGD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
+        #      bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
     return losses, ws
 
 #------------------------------------------------------------------------------------------------------
@@ -182,3 +182,12 @@ def build_model_data(x, y):
     num_samples = len(y)
     tx = np.c_[np.ones(num_samples), x]
     return tx,y
+def compute_accuracy(y_pred, y):
+    N = len(y)
+    return 100*((y_pred==y).sum())/N
+
+def predict_y(tx, w):
+    y_pred = tx@w
+    y_pred[np.where(y_pred <= 0)] = -1
+    y_pred[np.where(y_pred > 0)] = 1
+    return y_pred

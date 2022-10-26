@@ -16,5 +16,6 @@ def ridge_regression(y, tx, lambda_):
     >>> ridge_regression(np.array([0.1,0.2]), np.array([[2.3, 3.2], [1., 0.1]]), 1)
     array([0.03947092, 0.00319628])
     """
-    new_weigth = np.linalg.inv(tx.T@tx + (2*tx.shape[0]*lambda_*np.identity(tx.shape[1])))@(tx.T@y)
-    return (new_weigth)
+    N, D = tx.shape
+    w = np.linalg.solve(np.dot(tx.T, tx) + 2 * lambda_ * N * np.eye(D), np.dot(tx.T, y))
+    return (w)
