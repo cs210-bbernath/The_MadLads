@@ -182,6 +182,44 @@ def standardize(x):
 #------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------
 
+
+def create_cor_matrix(cleaned_columns):
+    cor_matrix = np.corrcoef(cleaned_columns)
+    upper_tri = np.triu(cor_matrix)
+    for i in range(upper_tri.shape[0]):
+        upper_tri[i][i]= 0
+    return list(zip(*np.where(upper_tri > 0.9)))
+
+
+def count(zipped):
+    c = [item for z in zipped for item in z]
+    return [(x,c.count(x)) for x in set(c)]
+
+
+def del_biggest_cor(cleaned_columns):
+    zipped = create_cor_matrix(cleaned_columns)
+    while len(zipped) > 0 :
+        biggest = (-1,-1)
+        cnt = count(zipped)
+        print(cnt)
+        for c in cnt:
+            if c[1] > biggest[1]:
+                biggest = c
+        del cleaned_columns[biggest[0]]
+        print(np.shape(cleaned_columns))
+        zipped = create_cor_matrix(cleaned_columns)
+    return cleaned_columns
+
+def clean_standardize_data(input_data):
+    cleaned_columns = [c for c in input_data.T if (c==-999).sum()/len(c) < 0.2]
+    for c in cleaned_columns:
+        numb_of_nan = (c==-999).sum()
+        median = np.median(list(filter(lambda x : x!= -999, c)))
+        c[c == -999] = median
+    del_biggest_cor(cleaned_columns)
+    std_data, mean, std = standardize(np.transpose(cleaned_columns))
+    return std_data
+
 # build model data when not using polynomial expansion
 def build_model_data(x, y):
     num_samples = len(y)
