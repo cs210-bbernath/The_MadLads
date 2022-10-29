@@ -82,7 +82,7 @@ def cross_validation(y, tx, func, k_indices = 0, k = 0, lambda_ = 0, degree = 0,
         w = ridge_regression(train_y, model_tr, lambda_)
     elif func == 'reg_logistic_regression':
         l, ws = reg_logistic_regression(train_y, model_tr, lambda_, initial_w, max_iters, gamma)
-        idx = np.argmax(l)
+        idx = np.argmin(l)
         loss = l[idx]
         w = ws[idx]
     elif func == 'logistic_regression':
@@ -99,9 +99,7 @@ def cross_validation(y, tx, func, k_indices = 0, k = 0, lambda_ = 0, degree = 0,
         l, ws = gradient_descent(train_y, model_tr, initial_w, max_iters, gamma)
         idx = np.argmin(l)
         loss = l[idx]
-        w = ws[idx]
-    
-    
+        w = ws[idx]   
     if(func == 'ridge_regression'):
         y_pred = predict_y(model_te, w)
         loss_tr = np.sqrt(2*compute_ridge_mse(train_y, model_tr, w))
@@ -110,9 +108,8 @@ def cross_validation(y, tx, func, k_indices = 0, k = 0, lambda_ = 0, degree = 0,
         y_pred = predict_logistic(model_te, w)
         acc = compute_accuracy(y_pred, test_y)
         nbr_1 = y_pred.sum()/y_pred.shape[0]
-        print('nbr 1:'+str(nbr_1))
-        loss_tr = log_loss(train_y, model_tr, w)
-        loss_te = log_loss(test_y, model_te, w)
+        loss_tr = log_loss(train_y, model_tr, w, lambda_)
+        loss_te = log_loss(test_y, model_te, w, lambda_)
     else:
         y_pred = predict_y(model_te, w)
         # calculate the loss for train and test data:        
@@ -123,12 +120,6 @@ def cross_validation(y, tx, func, k_indices = 0, k = 0, lambda_ = 0, degree = 0,
         
     return loss_tr, loss_te, acc
 
-
-
-def log_loss(y, tx, w):
-    y_pred = sigmoid(tx@w)
-
-    return -np.sum(np.dot(y.T,np.log(y_pred)+ np.dot((1-y).T, np.log(1-y_pred))))
 
 def cross_validation_gradient_descent(y, tx, k_fold, max_iters, gammas, degrees):
     seed = 12
@@ -364,7 +355,7 @@ def cross_validation_reg_logistic_regression(y, tx, k_fold, max_iters, lambdas, 
             rmse_tmp_tr = rmse_tr[(i)*len(lambdas):(i+1)*len(lambdas)]
             rmse_tmp_te = rmse_te[(i)*len(lambdas):(i+1)*len(lambdas)]
             cross_validation_visualization(lambdas, rmse_tmp_tr, rmse_tmp_te)
-    best_rmse = min(rmse_te)
+    best_rmse = max(rmse_te)
     index = rmse_te.index(best_rmse)
     print(max(tmp))
     acc, deg, best_gamma, best_lambda = parameters[index]

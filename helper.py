@@ -183,12 +183,12 @@ def standardize(x):
 #------------------------------------------------------------------------------------------------------
 
 
-def create_cor_matrix(cleaned_columns):
+def create_cor_matrix(cleaned_columns, fact):
     cor_matrix = np.corrcoef(cleaned_columns)
     upper_tri = np.triu(cor_matrix)
     for i in range(upper_tri.shape[0]):
         upper_tri[i][i]= 0
-    return list(zip(*np.where(upper_tri > 0.9)))
+    return list(zip(*np.where(upper_tri > fact)))
 
 
 def count(zipped):
@@ -196,8 +196,8 @@ def count(zipped):
     return [(x,c.count(x)) for x in set(c)]
 
 
-def del_biggest_cor(cleaned_columns):
-    zipped = create_cor_matrix(cleaned_columns)
+def del_biggest_cor(cleaned_columns, fact):
+    zipped = create_cor_matrix(cleaned_columns, fact)
     while len(zipped) > 0 :
         biggest = (-1,-1)
         cnt = count(zipped)
@@ -207,16 +207,16 @@ def del_biggest_cor(cleaned_columns):
                 biggest = c
         del cleaned_columns[biggest[0]]
         print(np.shape(cleaned_columns))
-        zipped = create_cor_matrix(cleaned_columns)
+        zipped = create_cor_matrix(cleaned_columns, fact)
     return cleaned_columns
 
-def clean_standardize_data(input_data):
+def clean_standardize_data(input_data, fact=1):
     cleaned_columns = [c for c in input_data.T if (c==-999).sum()/len(c) < 0.2]
     for c in cleaned_columns:
         numb_of_nan = (c==-999).sum()
         median = np.median(list(filter(lambda x : x!= -999, c)))
         c[c == -999] = median
-    del_biggest_cor(cleaned_columns)
+    del_biggest_cor(cleaned_columns, fact)
     std_data, mean, std = standardize(np.transpose(cleaned_columns))
     return std_data
 

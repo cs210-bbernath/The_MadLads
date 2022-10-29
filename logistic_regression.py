@@ -26,16 +26,14 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     N = len(y)
     
     for n_iter in range(max_iters):
-        # compute gradient
-        gradient = 2/N * tx.T.dot(sigmoid(tx.dot(w)) - y)
-        
+        # compute gradient        
         # update w by gradient
         gradient = logistic_gradient(y, tx, w, lambda_=0)
         w = w - (gamma * gradient)
         
         y_pred = sigmoid(tx.dot(w))
         # compute loss
-        loss = -np.sum(np.dot(y.T,np.log(y_pred)+ np.dot((1-y).T, np.log(1-y_pred)))) /(len(y_pred))
+        loss = log_loss(y, tx, w, lambda_=0)
         
         # store w and loss
         ws.append(w)
@@ -71,15 +69,13 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     
     for n_iter in range(max_iters):
         # compute gradient
-        gradient = 2/N * tx.T.dot(sigmoid(tx@w) - y) + (lambda_)*w
+        gradient = logistic_gradient(y, tx, w, lambda_)
         
         # update w by gradient
         w = w - (gamma * gradient)
-        
-        y_pred = sigmoid(tx.dot(w))
-        
+                
         # compute loss
-        loss = -np.sum(np.dot(y.T,np.log(y_pred)+ np.dot((1-y).T, np.log(1-y_pred)))) /(len(y_pred)) + (lambda_/2)*(w.T.dot(w))
+        loss = log_loss(y,tx, w, lambda_)
         # store w and loss
         ws.append(w)
         losses.append(loss)
@@ -87,3 +83,11 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         #      bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
 
     return losses, ws
+
+
+
+
+def log_loss(y, tx, w, lambda_=0):
+    y_pred = sigmoid(tx@w)
+
+    return -np.sum(np.dot(y.T,np.log(y_pred)+ np.dot((1-y).T, np.log(1-y_pred)))) /(len(y_pred)) + (lambda_/2)*(w.T.dot(w))
