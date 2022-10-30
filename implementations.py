@@ -9,7 +9,7 @@ from logistic_regression import *
 from cross_validation import *
 
 
-def mean_squared_error_gd(y, tx, initial w, max_iters, gamma):
+def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     """The Gradient Descent (GD) algorithm.
     Args:
         y: numpy array of shape=(N, )
@@ -54,7 +54,7 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
     losses = []
     w = initial_w
     for n_iter in range(max_iters):
-        for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size=batch_size):
+        for minibatch_y, minibatch_tx in batch_iter(y, tx, batch_size=1):
             # compute stoch_gradient
             stoch_gradient = compute_stoch_gradient(minibatch_y, minibatch_tx, w)
             # compute loss
