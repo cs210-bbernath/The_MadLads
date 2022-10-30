@@ -1,12 +1,13 @@
 import numpy as np
 import matplotlib as plt
 from hilp import load_csv_data
-from helper import *
+from helper2 import *
 from costs import *
 from least_squares import *
 from ridge_regression import *
 from logistic_regression import *
 from cross_validation import *
+from implementations import *
 
 
 # TODO Return type: Note that all functions should return: (w, loss), which is the last weight vector of the
@@ -17,7 +18,7 @@ from cross_validation import *
 
 # TODO check tests in https://github.com/epfml/ML_course/tree/master/projects/project1/grading_tests 
 
-#TODO change entete des fonctions + modifier output pour que elles return toutes (w, loss)
+# DONE change entete des fonctions + modifier output pour que elles return toutes (w, loss) DONE
 
 
 # run script that execute our pipeline
@@ -28,8 +29,8 @@ y_te, x_te, ids_te = load_csv_data('data/test.csv')
 
 # data cleaning
 factor = 0.8
-tx_tr = clean_standardize_data(x_tr, factor)
-tx_te = clean_standardize_data(x_te, factor)
+tx_tr, y_tr = clean_standardize(x_tr, y_tr, factor)
+tx_te, y_te = clean_standardize(x_te, y_te, factor)
 
 #range if parameters 
 k_fold = 4
@@ -41,9 +42,8 @@ initial_w = np.random.uniform(-1, 1, np.shape(x_tr)[1])
 
 # best gamma for GRADIENT descent mean squared error using cross validation
 best_gamma, best_rmse, acc, deg = cross_validation_gradient_descent(y_tr, tx_tr, k_fold, max_iters, gammas, degrees)
-losses, ws = gradient_descent(y_tr, tx_tr, initial_w, max_iters, best_gamma)
-w_gradient_descent = ws[-1] #last weights
-y_pred = predict(tx_te, w_gradient_descent)
+w_gradient_descent, loss = mean_squared_error_gd(y_tr, tx_tr, initial_w, max_iters, best_gamma)
+y_pred = predict_y(tx_te, w_gradient_descent)
 name = 'gradient_descent_submission'
 create_csv_submission(ids_te, y_pred, name)
 
@@ -52,9 +52,8 @@ create_csv_submission(ids_te, y_pred, name)
 batch_size = 1
 # best gamma for STOCHASTIC GRADIENT descent mean squared error using cross validation
 best_gamma, best_rmse = cross_validation_stochastic_gradient_descent(y_tr, tx_tr, k_fold, initial_w, max_iters, gammas, batch_size)
-losses, ws = stochastic_gradient_descent(y_tr, tx_tr, initial_w, batch_size, max_iters, best_gamma)
-w_stoch_gradient_descent = ws[-1]
-y_pred = predict(tx_te, w_stoch_gradient_descent)
+w_stoch_gradient_descent, loss = mean_squared_error_sgd(y_tr, tx_tr, initial_w, max_iters, best_gamma)
+y_pred = predict_y(tx_te, w_stoch_gradient_descent)
 name = 'stoch_gradient_descent_submission'
 create_csv_submission(ids_te, y_pred, name)
 
@@ -69,7 +68,7 @@ create_csv_submission(ids_te, y_pred, name)
 
 # best lambda for RIDGE REGRESSION (least squared with lambda) using cross validation
 best_lambda, best_rmse, acc, deg = cross_validation_ridge_regression(y_tr, tx_tr, k_fold, lambdas, degrees)
-w_ridge_regression = ridge_regression(y_tr, tx_tr, lambda_)
+w_ridge_regression, loss = ridge_regression(y_tr, tx_tr, lambda_)
 y_pred = predict(tx_te, w_ridge_regression)
 name = 'ridge_regression_submission'
 create_csv_submission(ids_te, y_pred, name)
@@ -83,20 +82,16 @@ y_te[np.where(y_te == -1)] = 0
 
 # best gamma for LOGISTIC REGRESSION (stochastic) gradient descent using cross validation
 best_gamma, best_rmse, acc, deg = cross_validation_logistic_regression(y_tr, tx_tr, k_fold, max_iters, gammas, degrees)
-losses, ws = logistic_regression(y_tr, tx_tr, initial_w, max_iters, best_gamma)
-w_log_regression = ws[-1]
+w_log_regression, loss = logistic_regression(y_tr, tx_tr, initial_w, max_iters, best_gamma)
 y_pred = predict_logistic(tx_te, w_log_regression)
-y_pred[np.where(y_pred == 0)] = -1 #why again??
 name = 'logistic_regression_submission'
 create_csv_submission(ids_te, y_pred, name)
 
 
 # best gamma AND lambda for REGULARIZED LOGISTIC REGRESSION (stochastic) gradient descent using cross validation
 best_gamma, best_lambda, best_rmse, tmp, deg = cross_validation_reg_logistic_regression(y_tr, tx_tr, k_fold, max_iters, lambdas, gammas, degrees)
-losses, ws = reg_logistic_regression(y_tr, tx_tr, best_lambda, initial_w, max_iters, best_gamma)
-w_reg_log_regression = ws[-1]
+w_reg_log_regression, loss = reg_logistic_regression(y_tr, tx_tr, best_lambda, initial_w, max_iters, best_gamma)
 y_pred = predict_logistic(tx_te, w_reg_log_regression)
-y_pred[np.where(y_pred == 0)] = -1 #why again??
 name = 'reg_logistic_regression_submission'
 create_csv_submission(ids_te, y_pred, name)
 
