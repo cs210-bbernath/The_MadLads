@@ -411,9 +411,4 @@ def best_degree_selection(degrees, k_fold, lambdas, seed, y, tx):
     best_degree = degrees[best_rmses.index(best_rmse)]
     
     return best_degree, best_lambda, best_rmse
-def predict_logistic(x: np.ndarray, w: np.ndarray) -> np.ndarray:
-    y_pred = sigmoid(x @ w)
-    print(y_pred)
-    y_pred[np.where(y_pred <= 0.5)] = 0
-    y_pred[np.where(y_pred > 0.5)] = 1
-    return y_pred
+
