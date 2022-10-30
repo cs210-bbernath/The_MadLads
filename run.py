@@ -1,9 +1,8 @@
 import numpy as np
 import matplotlib as plt
-from hilp import load_csv_data
+from hilp import *
 from helper2 import *
 from costs import *
-from cross_validation import *
 from implementations import *
 
 
@@ -30,20 +29,12 @@ tx_tr, y_tr = clean_standardize(x_tr, y_tr, factor)
 tx_te, y_te = clean_standardize(x_te, y_te, factor)
 print("------------------------------------------")
 
-#range if parameters 
-k_fold = 4
-max_iters = 300
-lambdas = [0.01, 0.001]
-gammas = [0.08, 0.02, 0.1]
-degrees = [1, 2]
 
-#print("Gradient descent cross validation")
 # best gamma for GRADIENT descent mean squared error using cross validation
-#best_gamma, best_rmse, acc, deg = cross_validation_gradient_descent(y_tr, tx_tr, k_fold, max_iters, gammas, degrees)
 print("Gradient descent computing...")
 tx_tr = build_poly(tx_tr, 1)
 tx_te = build_poly(tx_te, 1)
-initial_w = np.random.uniform(-1,1,tx.shape[1])
+initial_w = np.random.uniform(-1,1,tx_tr.shape[1])
 w, loss = mean_squared_error_gd(y_tr, tx_tr, initial_w, 300, 0.08)
 w_gradient_descent, loss = mean_squared_error_gd(y_tr, tx_tr, initial_w, 300, 0.08)
 y_pred_te = predict_y(tx_te, w_gradient_descent)
@@ -56,13 +47,11 @@ print("------------------------------------------")
 
 
 # For SGD, you must use the standard mini-batch-size 1
-batch_size = 1
 # best gamma for STOCHASTIC GRADIENT descent mean squared error using cross validation
-#print("Stochastic Gradient descent cross validation")
-#best_gamma, best_rmse = cross_validation_stochastic_gradient_descent(y_tr, tx_tr, k_fold, initial_w, max_iters, gammas, batch_size)
 print("Stochastic Gradient descent computing...")
 
 w_stoch_gradient_descent, loss = mean_squared_error_sgd(y_tr, tx_tr, initial_w, 10, 0.009)
+
 y_pred_te = predict_y(tx_te, w_stoch_gradient_descent)
 y_pred_tr = predict_y(tx_tr, w_stoch_gradient_descent)
 print("Accuracy: ", compute_accuracy(y_pred_tr, y_tr))
@@ -89,7 +78,7 @@ y_pred_te = predict_y(tx_te, w_ridge_regression)
 y_pred_tr = predict_y(tx_tr, w_ridge_regression)
 print("Accuracy: ", compute_accuracy(y_pred_tr, y_tr))
 name = 'ridge_regression_submission'
-create_csv_submission(ids_te, y_pred, name)
+create_csv_submission(ids_te, y_pred_te, name)
 print("------------------------------------------")
 
 
@@ -103,7 +92,6 @@ print("------------------------------------------")
 
 # best gamma for LOGISTIC REGRESSION (stochastic) gradient descent using cross validation
 print("Logistic Regression...")
-#best_gamma, best_rmse, acc, deg = cross_validation_logistic_regression(y_tr, tx_tr, k_fold, max_iters, gammas, degrees)
 w_log_regression, loss = logistic_regression(y_tr, tx_tr, initial_w, 1000, 0.08)
 y_pred_te = predict_logistic(tx_te, w_log_regression)
 y_pred_tr = predict_logistic(tx_tr, w_log_regression)
@@ -115,7 +103,6 @@ print("------------------------------------------")
 
 # best gamma AND lambda for REGULARIZED LOGISTIC REGRESSION (stochastic) gradient descent using cross validation
 print("Regularized Logistic Regression...")
-#best_gamma, best_lambda, best_rmse, tmp, deg = cross_validation_reg_logistic_regression(y_tr, tx_tr, k_fold, max_iters, lambdas, gammas, degrees)
 w_reg_log_regression, loss = reg_logistic_regression(y_tr, tx_tr, 0.05, initial_w, 1000, 0.08)
 y_pred_te = predict_logistic(tx_te, w_reg_log_regression)
 y_pred_tr = predict_logistic(tx_tr, w_reg_log_regression)
