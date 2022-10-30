@@ -50,7 +50,7 @@ print("------------------------------------------")
 # best gamma for STOCHASTIC GRADIENT descent mean squared error using cross validation
 print("Stochastic Gradient descent computing...")
 
-w_stoch_gradient_descent, loss = mean_squared_error_sgd(y_tr, tx_tr, initial_w, 10, 0.009)
+w_stoch_gradient_descent, loss = mean_squared_error_sgd(y_tr, tx_tr, initial_w, 1000, 0.009)
 
 y_pred_te = predict_y(tx_te, w_stoch_gradient_descent)
 y_pred_tr = predict_y(tx_tr, w_stoch_gradient_descent)
