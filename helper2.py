@@ -251,3 +251,8 @@ def predict_logistic(x: np.ndarray, w: np.ndarray):
     y_pred[np.where(y_pred <= 0.5)] = 0
     y_pred[np.where(y_pred > 0.5)] = 1
     return y_pred
+
+
+def sigmoid(t):
+    t = np.clip(t, -20, 20)
+    return 1 / (1 + np.exp(-t))
