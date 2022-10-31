@@ -8,7 +8,8 @@ from ridge_regression import ridge_regression
 from build_polynomial import build_poly
 from plots import cross_validation_visualization
 
-
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
 
 def build_k_indices(y, k_fold, seed):
     """build k indices for k-fold.
@@ -32,7 +33,8 @@ def build_k_indices(y, k_fold, seed):
     k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
     return np.array(k_indices)
 
-
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
 
 def cross_validation(y, tx, func, k_indices = 0, k = 0, lambda_ = 0, degree = 0, max_iters = 0, gamma = 0, batch_size = 0):
     """return the loss of ridge regression for a fold corresponding to k_indices
@@ -121,7 +123,24 @@ def cross_validation(y, tx, func, k_indices = 0, k = 0, lambda_ = 0, degree = 0,
     return loss_tr, loss_te, acc
 
 
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
+
+
 def cross_validation_gradient_descent(y, tx, k_fold, max_iters, gammas, degrees):
+    """cross validation over regularisation parameter gamma.
+    
+    Args:
+        degree: integer, degree of the polynomial expansion
+        k_fold: integer, the number of folds
+        gammas: shape = (p, ) where p is the number of values of gammas to test
+        max_iters : number of iterations
+    Returns:
+        best_gamma : scalar, value of the best lambda
+        best_rmse : scalar, the associated root mean squared error for the best lambda
+        acc : accuracy of the best combo of parameters
+        deg : best degree
+    """
     seed = 12
     degrees = degrees
     k_fold = k_fold
@@ -160,15 +179,19 @@ def cross_validation_gradient_descent(y, tx, k_fold, max_iters, gammas, degrees)
 
     return best_gamma, best_rmse, acc, deg
 
+
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
+
 def cross_validation_stochastic_gradient_descent(y, tx, k_fold, initial_w, max_iters, gammas, batch_size):
-    """cross validation over regularisation parameter lambda.
+    """cross validation over regularisation parameter gamma.
     
     Args:
-        degree: integer, degree of the polynomial expansion
         k_fold: integer, the number of folds
-        lambdas: shape = (p, ) where p is the number of values of lambda to test
+        gammas: shape = (p, ) where p is the number of values of gamma to test
+        max_iters : number of iterations
     Returns:
-        best_lambda : scalar, value of the best lambda
+        best_gamma : scalar, value of the best lambda
         best_rmse : scalar, the associated root mean squared error for the best lambda
     """
     
@@ -200,16 +223,23 @@ def cross_validation_stochastic_gradient_descent(y, tx, k_fold, initial_w, max_i
     print("For polynomial expansion up to degree, the choice of gamma which leads to the best rmse is %.5f with a test rmse of %.3f" % (best_gamma, best_rmse))
     return best_gamma, best_rmse
 
+
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
+
+
 def cross_validation_ridge_regression(y, tx, k_fold, lambdas, degrees):
     """cross validation over regularisation parameter lambda.
     
     Args:
-        degree: integer, degree of the polynomial expansion
+        degrees: degree of the polynomial expansion to test
         k_fold: integer, the number of folds
         lambdas: shape = (p, ) where p is the number of values of lambda to test
     Returns:
         best_lambda : scalar, value of the best lambda
         best_rmse : scalar, the associated root mean squared error for the best lambda
+        acc : best accuracy
+        deg : best degree
     """
     
     seed = 12
@@ -254,16 +284,23 @@ def cross_validation_ridge_regression(y, tx, k_fold, lambdas, degrees):
 
     return best_lambda, best_rmse, acc, deg
 
+
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
+
 def cross_validation_logistic_regression(y, tx, k_fold, max_iters, gammas, degrees):
     """cross validation over regularisation parameter lambda.
     
     Args:
-        degree: integer, degree of the polynomial expansion
+        degrees: degree of the polynomial expansion to test
         k_fold: integer, the number of folds
         lambdas: shape = (p, ) where p is the number of values of lambda to test
+        max_iters : number of iterations
     Returns:
         best_lambda : scalar, value of the best lambda
         best_rmse : scalar, the associated root mean squared error for the best lambda
+        acc : best accuracy
+        deg : best degree
     """
     
     seed = 12
@@ -275,10 +312,6 @@ def cross_validation_logistic_regression(y, tx, k_fold, max_iters, gammas, degre
     # define lists to store the loss of training data and test data
     rmse_tr = []
     rmse_te = []
-    # ***************************************************
-    # INSERT YOUR CODE HERE
-    # cross validation over lambdas: TODO
-    # ***************************************************
     parameters = []
     tmp = []
     for degree in degrees:
@@ -304,20 +337,29 @@ def cross_validation_logistic_regression(y, tx, k_fold, max_iters, gammas, degre
     index = rmse_te.index(best_rmse)
     print(max(tmp))
     (acc, deg, best_gamma) = parameters[index]
-    #print("For polynomial expansion up to degree %.f, the choice of lambda which leads to the best test rmse is %.5f with a test rmse of %.3f" % (degree, best_lambda, best_rmse))
 
     return best_gamma, best_rmse, acc, deg
 
+
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
+
+
 def cross_validation_reg_logistic_regression(y, tx, k_fold, max_iters, lambdas, gammas, degrees):
-    """cross validation over regularisation parameter lambda.
+    """cross validation over regularisation parameter lambda and gamma.
     
     Args:
-        degree: integer, degree of the polynomial expansion
+        degrees: degree of the polynomial expansion to test
         k_fold: integer, the number of folds
+        max_iters : number of iterations
         lambdas: shape = (p, ) where p is the number of values of lambda to test
+        gammas : shape = (p, ) where p is the number of values of gamma to test
     Returns:
+        best_gamma : scalar, value of the best lambda
         best_lambda : scalar, value of the best lambda
         best_rmse : scalar, the associated root mean squared error for the best lambda
+        tmp : tab of accuracy
+        deg : best degree
     """
     
     seed = 12
@@ -329,10 +371,6 @@ def cross_validation_reg_logistic_regression(y, tx, k_fold, max_iters, lambdas, 
     # define lists to store the loss of training data and test data
     rmse_tr = []
     rmse_te = []
-    # ***************************************************
-    # INSERT YOUR CODE HERE
-    # cross validation over lambdas: TODO
-    # ***************************************************
     parameters = []
     tmp = []
     for degree in degrees:
@@ -357,11 +395,13 @@ def cross_validation_reg_logistic_regression(y, tx, k_fold, max_iters, lambdas, 
             cross_validation_visualization(lambdas, rmse_tmp_tr, rmse_tmp_te)
     best_rmse = max(rmse_te)
     index = rmse_te.index(best_rmse)
-    print(max(tmp))
+    #print(max(tmp))
     acc, deg, best_gamma, best_lambda = parameters[index]
-    #print("For polynomial expansion up to degree %.f, the choice of lambda which leads to the best test rmse is %.5f with a test rmse of %.3f" % (degree, best_lambda, best_rmse))
 
     return best_gamma, best_lambda, best_rmse, tmp, deg
+
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
 
 def best_degree_selection(degrees, k_fold, lambdas, seed, y, tx):
     """cross validation over regularisation parameter lambda and degree.
@@ -412,3 +452,6 @@ def best_degree_selection(degrees, k_fold, lambdas, seed, y, tx):
     
     return best_degree, best_lambda, best_rmse
 
+
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
