@@ -6,6 +6,8 @@ The project 1 consisted of using regression methods to classify a dataset from t
 
 To reproduce our results:
 - clone the repository and add the data folder from the AICrowd challenge into the directory of the repository
-- run the run.py file to reproduce our results, this python file outputs submission files that you can submit on the AICrowd challenge
+- run the run.py file to reproduce our results, this python file outputs submission files that you can submit on the AICrowd challenge*
 - use the jupyter notebooks to reproduce our cross validation for the hyper-parameters
 
+
+* the run.py file produces 6 different outputs; one for each method (GD, SGD, LS, RR, LR, RLR), the one we used for the submission ID is the ridge regression one.
