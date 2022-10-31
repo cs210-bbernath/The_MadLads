@@ -111,7 +111,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     for n_iter in range(max_iters):
         # compute gradient        
         # update w by gradient
-        gradient = 2/N * tx.T.dot(sigmoid(tx@w) - y) + (lambda_)*w
+        gradient = 2/N * tx.T.dot(sigmoid(tx@w) - y)
         w = w - (gamma * gradient)
         y_pred = sigmoid(tx.dot(w))
         # compute loss
@@ -153,4 +153,3 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     loss = losses[-1]
     w = ws[-1]
     return w, loss
-
