@@ -1,11 +1,7 @@
 import numpy as np
 import matplotlib as plt
-from hilp import *
-from helper2 import *
-#from costs import *
-#from least_squares import *
-#from ridge_regression import *
-#from logistic_regression import *
+
+from helper import *
 from cross_validation import *
 
 
@@ -115,7 +111,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     for n_iter in range(max_iters):
         # compute gradient        
         # update w by gradient
-        gradient = logistic_gradient(y, tx, w, lambda_=0)
+        gradient = 2/N * tx.T.dot(sigmoid(tx@w) - y) + (lambda_)*w
         w = w - (gamma * gradient)
         y_pred = sigmoid(tx.dot(w))
         # compute loss
@@ -146,7 +142,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
     N = len(y)
     for n_iter in range(max_iters):
         # compute gradient
-        gradient = logistic_gradient(y, tx, w, lambda_)
+        gradient = 2/N * tx.T.dot(sigmoid(tx@w) - y) + (lambda_)*w
         # update w by gradient
         w = w - (gamma * gradient)
         # compute loss

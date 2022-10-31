@@ -1,12 +1,7 @@
 import numpy as np
 import matplotlib as plt
 from helper import *
-from logistic_regression import *
 
-from costs import compute_mse
-from ridge_regression import ridge_regression
-from build_polynomial import build_poly
-from plots import cross_validation_visualization
 
 #------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------
