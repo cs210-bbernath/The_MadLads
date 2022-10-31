@@ -10,4 +10,4 @@ To reproduce our results:
 - use the jupyter notebooks to reproduce our cross validation for the hyper-parameters
 
 
-* the run.py file produces 6 different outputs; one for each method (GD, SGD, LS, RR, LR, RLR), the one we used for the submission ID is the ridge regression one.
+* the run.py file produces 6 different outputs in csv format; one for each method (GD, SGD, LS, RR, LR, RLR), the one we used for the submission ID is the ridge regression one ('ridge_regression_submission').
